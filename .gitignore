@@ -34,3 +34,4 @@ mix.lock
 
 # Vim files
 tags*
+.expert

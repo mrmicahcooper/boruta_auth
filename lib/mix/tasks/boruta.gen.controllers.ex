@@ -108,7 +108,9 @@ defmodule Mix.Tasks.Boruta.Gen.Controllers do
 
   def run(_args) do
     if Mix.Project.umbrella?() do
-      Mix.raise "mix boruta.gen.controllers must be invoked from within your *_web application root directory"
+      Mix.raise(
+        "mix boruta.gen.controllers must be invoked from within your *_web application root directory"
+      )
     end
 
     otp_app = Mix.Phoenix.context_app()
@@ -184,7 +186,7 @@ defmodule Mix.Tasks.Boruta.Gen.Controllers do
   end
 
   defp copy_modules(otp_app, assigns) do
-    List.zip([template_paths(@module_paths), @module_paths])
+    Enum.zip([template_paths(@module_paths), @module_paths])
     |> Enum.map(fn {source, controller_path} ->
       target =
         otp_app
@@ -196,7 +198,7 @@ defmodule Mix.Tasks.Boruta.Gen.Controllers do
   end
 
   defp copy_raw_files(otp_app, assigns) do
-    List.zip([raw_file_paths(@raw_file_paths), @raw_file_paths])
+    Enum.zip([raw_file_paths(@raw_file_paths), @raw_file_paths])
     |> Enum.map(fn {source, controller_path} ->
       target =
         otp_app
@@ -208,7 +210,7 @@ defmodule Mix.Tasks.Boruta.Gen.Controllers do
   end
 
   defp copy_test_files(otp_app, assigns) do
-    List.zip([template_paths(@test_files), @test_files])
+    Enum.zip([template_paths(@test_files), @test_files])
     |> Enum.map(fn {source, controller_path} ->
       target =
         otp_app

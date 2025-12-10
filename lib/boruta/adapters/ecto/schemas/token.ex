@@ -18,6 +18,7 @@ defmodule Boruta.Ecto.Token do
   @type t :: %__MODULE__{
           type: String.t(),
           value: String.t(),
+          plain_value: String.t(),
           state: String.t(),
           nonce: String.t(),
           scope: String.t(),
@@ -37,7 +38,9 @@ defmodule Boruta.Ecto.Token do
   schema "oauth_tokens" do
     field(:type, :string)
     field(:value, :string)
+    field(:plain_value, :string, virtual: true)
     field(:refresh_token, :string)
+    field(:plain_refresh_token, :string, virtual: true)
     field(:previous_token, :string)
     field(:previous_code, :string)
     field(:state, :string)
@@ -164,19 +167,19 @@ defmodule Boruta.Ecto.Token do
   end
 
   defp put_value(%Ecto.Changeset{data: data, changes: changes} = changeset) do
-    put_change(
-      changeset,
-      :value,
-      token_generator().generate(:access_token, struct(data, changes))
-    )
+    value = token_generator().generate(:access_token, struct(data, changes))
+
+    changeset
+    |> put_change(:value, hash_secret(value))
+    |> put_change(:plain_value, value)
   end
 
   defp put_refresh_token(%Ecto.Changeset{data: data, changes: changes} = changeset) do
-    put_change(
-      changeset,
-      :refresh_token,
-      token_generator().generate(:refresh_token, struct(data, changes))
-    )
+    value = token_generator().generate(:refresh_token, struct(data, changes))
+
+    changeset
+    |> put_change(:refresh_token, hash_secret(value))
+    |> put_change(:plain_refresh_token, value)
   end
 
   defp put_expires_at(changeset) do
@@ -207,5 +210,11 @@ defmodule Boruta.Ecto.Token do
       :code_challenge_hash,
       changeset |> get_field(:code_challenge, "") |> Oauth.Token.hash()
     )
+  end
+
+  def hash_secret(nil), do: nil
+
+  def hash_secret(data) do
+    :sha512 |> :crypto.hash(data) |> Base.encode64(padding: false)
   end
 end

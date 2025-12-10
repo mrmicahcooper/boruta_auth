@@ -154,7 +154,9 @@ defmodule Boruta.OpenidTest.UserinfoTest do
       sub = SecureRandom.uuid()
       claims = %{"claim" => true}
       %Token{client: client, value: access_token} = insert(:token, sub: sub)
-      {:ok, _client} = Ecto.Changeset.change(client, %{userinfo_signed_response_alg: "HS512"}) |> Repo.update()
+
+      {:ok, _client} =
+        Ecto.Changeset.change(client, %{userinfo_signed_response_alg: "HS512"}) |> Repo.update()
 
       conn = %Plug.Conn{body_params: %{"access_token" => access_token}}
 

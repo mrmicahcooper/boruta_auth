@@ -4,6 +4,8 @@ defmodule Boruta.OauthTest.RefreshTokenTest do
 
   import Boruta.Factory
 
+  import Ecto.Changeset
+
   alias Boruta.Ecto
   alias Boruta.Ecto.OauthMapper
   alias Boruta.Ecto.TokenStore
@@ -12,6 +14,23 @@ defmodule Boruta.OauthTest.RefreshTokenTest do
   alias Boruta.Oauth.Error
   alias Boruta.Oauth.TokenResponse
   alias Boruta.Repo
+
+  def hash_schema(schema) do
+    value = schema.value
+    refresh_token = schema.refresh_token
+
+    value_hash = Boruta.Ecto.Token.hash_secret(value)
+    refresh_token_hash = Boruta.Ecto.Token.hash_secret(refresh_token)
+
+    schema
+    |> change(%{
+      value: value_hash,
+      refresh_token: refresh_token_hash
+    })
+    |> Repo.update!()
+    |> Map.put(:value, value)
+    |> Map.put(:refresh_token, refresh_token)
+  end
 
   describe "refresh_token" do
     setup do
@@ -30,6 +49,7 @@ defmodule Boruta.OauthTest.RefreshTokenTest do
           redirect_uri: List.first(client.redirect_uris),
           expires_at: :os.system_time(:seconds) - 10
         )
+        |> hash_schema()
 
       expired_refresh_token =
         insert(
@@ -38,6 +58,7 @@ defmodule Boruta.OauthTest.RefreshTokenTest do
           client: expired_refresh_token_client,
           redirect_uri: List.first(client.redirect_uris)
         )
+        |> hash_schema()
 
       {:ok, revoked_at} = (:os.system_time(:seconds) - 10) |> DateTime.from_unix()
 
@@ -49,6 +70,7 @@ defmodule Boruta.OauthTest.RefreshTokenTest do
           redirect_uri: List.first(client.redirect_uris),
           revoked_at: revoked_at
         )
+        |> hash_schema()
 
       access_token =
         insert(
@@ -59,6 +81,7 @@ defmodule Boruta.OauthTest.RefreshTokenTest do
           expires_at: :os.system_time(:seconds) + 10,
           scope: "scope"
         )
+        |> hash_schema()
 
       public_refresh_token_access_token =
         insert(
@@ -69,6 +92,7 @@ defmodule Boruta.OauthTest.RefreshTokenTest do
           expires_at: :os.system_time(:seconds) + 10,
           scope: "scope"
         )
+        |> hash_schema()
 
       other_client_access_token =
         insert(
@@ -79,6 +103,7 @@ defmodule Boruta.OauthTest.RefreshTokenTest do
           expires_at: :os.system_time(:seconds) + 10,
           scope: "scope"
         )
+        |> hash_schema()
 
       {:ok,
        client: client,
@@ -459,8 +484,7 @@ defmodule Boruta.OauthTest.RefreshTokenTest do
       %{req_headers: [{"authorization", authorization_header}]} =
         using_basic_auth(client.id, client.secret)
 
-      assert {:token_success,
-              %TokenResponse{}} =
+      assert {:token_success, %TokenResponse{}} =
                Oauth.token(
                  %Plug.Conn{
                    body_params: %{

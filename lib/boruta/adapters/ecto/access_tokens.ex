@@ -11,6 +11,7 @@ defmodule Boruta.Ecto.AccessTokens do
   alias Boruta.Ecto.TokenStore
   alias Boruta.Oauth
   alias Boruta.Oauth.Client
+  alias Ecto.Changeset
 
   @impl Boruta.Oauth.AccessTokens
   def get_by(attrs) do
@@ -27,7 +28,7 @@ defmodule Boruta.Ecto.AccessTokens do
            repo().one(
              from t in Token,
                left_join: c in assoc(t, :client),
-               where: t.type == "access_token" and t.value == ^value
+               where: t.type == "access_token" and t.value == ^Token.hash_secret(value)
            ),
          {:ok, token} <- token |> to_oauth_schema() |> TokenStore.put() do
       token
@@ -39,7 +40,8 @@ defmodule Boruta.Ecto.AccessTokens do
            repo().one(
              from t in Token,
                left_join: c in assoc(t, :client),
-               where: t.type == "access_token" and t.refresh_token == ^refresh_token
+               where:
+                 t.type == "access_token" and t.refresh_token == ^Token.hash_secret(refresh_token)
            ),
          {:ok, token} <- token |> to_oauth_schema() |> TokenStore.put() do
       token
@@ -77,8 +79,16 @@ defmodule Boruta.Ecto.AccessTokens do
         [%Token{resource_owner: resource_owner}, token_attributes]
       )
 
+    plain_value = Changeset.get_change(changeset, :plain_value)
+    plain_refresh_token = Changeset.get_change(changeset, :plain_refresh_token)
+
     with {:ok, token} <- repo().insert(changeset),
-         {:ok, token} <- token |> to_oauth_schema() |> TokenStore.put() do
+         token <-
+           Map.put(token, :value, plain_value) |> Map.put(:refresh_token, plain_refresh_token),
+         {:ok, token} <-
+           token
+           |> to_oauth_schema()
+           |> TokenStore.put() do
       {:ok, token}
     else
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -93,7 +103,8 @@ defmodule Boruta.Ecto.AccessTokens do
 
   @impl Boruta.Oauth.AccessTokens
   def revoke(%Oauth.Token{client: client, value: value}) do
-    with %Token{} = token <- repo().get_by(Token, client_id: client.id, value: value),
+    with %Token{} = token <-
+           repo().get_by(Token, client_id: client.id, value: Token.hash_secret(value)),
          {:ok, token} <-
            token
            |> Token.revoke_changeset()
@@ -107,7 +118,8 @@ defmodule Boruta.Ecto.AccessTokens do
 
   @impl Boruta.Oauth.AccessTokens
   def revoke_refresh_token(%Oauth.Token{client: client, value: value}) do
-    with %Token{} = token <- repo().get_by(Token, client_id: client.id, value: value),
+    with %Token{} = token <-
+           repo().get_by(Token, client_id: client.id, value: Token.hash_secret(value)),
          {:ok, token} <-
            token
            |> Token.revoke_refresh_token_changeset()

@@ -6,6 +6,7 @@ defmodule Boruta.OauthTest.AuthorizationCodeGrantTest do
 
   alias Boruta.Ecto
   alias Boruta.Ecto.ScopeStore
+  alias Boruta.Ecto.Token
   alias Boruta.Oauth
   alias Boruta.Oauth.ApplicationMock
   alias Boruta.Oauth.AuthorizeResponse
@@ -1148,7 +1149,7 @@ defmodule Boruta.OauthTest.AuthorizationCodeGrantTest do
       assert access_token
       assert expires_in
       assert refresh_token
-      refute Repo.get_by(Ecto.Token, value: access_token).revoked_at
+      refute Repo.get_by(Ecto.Token, value: Token.hash_secret(access_token)).revoked_at
     end
 
     test "stores previous code", %{client: client, code: code, resource_owner: resource_owner} do
@@ -1173,7 +1174,7 @@ defmodule Boruta.OauthTest.AuthorizationCodeGrantTest do
                  ApplicationMock
                )
 
-      assert token = Repo.get_by(Ecto.Token, value: access_token)
+      assert token = Repo.get_by(Ecto.Token, value: Token.hash_secret(access_token))
       assert token.previous_code == code.value
     end
 
@@ -1257,7 +1258,7 @@ defmodule Boruta.OauthTest.AuthorizationCodeGrantTest do
                  ApplicationMock
                )
 
-      assert Repo.get_by(Ecto.Token, value: access_token).revoked_at
+      assert Repo.get_by(Ecto.Token, value: Token.hash_secret(access_token)).revoked_at
     end
 
     test "returns a token and an id_token with openid scope", %{
@@ -1326,7 +1327,7 @@ defmodule Boruta.OauthTest.AuthorizationCodeGrantTest do
       |> expect(:get_by, 2, fn _params -> {:ok, resource_owner} end)
 
       redirect_uri = List.first(client.redirect_uris)
-      Boruta.Ecto.Codes.get_by(value: code.value, redirect_uri: redirect_uri)
+      Boruta.Ecto.Codes.get_by(value: Token.hash_secret(code.value), redirect_uri: redirect_uri)
 
       case Oauth.token(
              %Plug.Conn{

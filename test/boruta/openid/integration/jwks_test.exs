@@ -20,7 +20,7 @@ defmodule Boruta.OpenidTest.JwksTest do
       assert Enum.sort(jwk_keys) ==
                [
                  %{
-                   "kid" => "Ac9ufCpgwReXGJ6LI",
+                   "kid" => "GqL/j1xoUOsVf6XNV",
                    "e" => "AQAB",
                    "kty" => "RSA",
                    "n" =>

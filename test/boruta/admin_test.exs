@@ -106,8 +106,9 @@ defmodule Boruta.Ecto.AdminTest do
 
     test "creates a client with a given secret" do
       secret = SecureRandom.hex(64)
+      hashed_secret = Boruta.Ecto.Token.hash_secret(secret)
 
-      assert {:ok, %Client{secret: ^secret}} = Admin.create_client(%{secret: secret})
+      assert {:ok, %Client{secret: ^hashed_secret}} = Admin.create_client(%{secret: secret})
     end
 
     test "creates a client with a default confidentiality to false" do
@@ -334,11 +335,13 @@ defmodule Boruta.Ecto.AdminTest do
 
     test "updates a client secret" do
       secret = "a_secret"
+      hashed_secret = Boruta.Ecto.Token.hash_secret(secret)
       client = client_fixture()
 
-      assert {:ok, %Client{secret: ^secret}} = Admin.regenerate_client_secret(client, secret)
+      assert {:ok, %Client{secret: ^hashed_secret}} =
+               Admin.regenerate_client_secret(client, secret)
 
-      assert %Client{secret: ^secret} = Repo.reload(client)
+      assert %Client{secret: ^hashed_secret} = Repo.reload(client)
     end
   end
 

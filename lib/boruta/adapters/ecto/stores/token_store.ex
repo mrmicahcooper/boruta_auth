@@ -9,14 +9,16 @@ defmodule Boruta.Ecto.TokenStore do
   @spec get([value: String.t()] | [refresh_token: String.t()]) ::
           {:ok, token :: Boruta.Oauth.Token.t()} | {:error, reason :: String.t()}
   def get(value: value) do
-    case cache_backend().get({Token, :value, value}) do
+    case cache_backend().get({Token, :value, Boruta.Ecto.Token.hash_secret(value)}) do
       nil -> {:error, "Not cached."}
       %Token{} = token -> {:ok, token}
     end
   end
 
   def get(refresh_token: refresh_token) do
-    case cache_backend().get({Token, :refresh_token, refresh_token}) do
+    case cache_backend().get(
+           {Token, :refresh_token, Boruta.Ecto.Token.hash_secret(refresh_token)}
+         ) do
       nil -> {:error, "Not cached."}
       %Token{} = token -> {:ok, token}
     end

@@ -1,9 +1,25 @@
 defmodule Boruta.Factory do
   @moduledoc false
 
+  import Ecto.Changeset
+
   use ExMachina.Ecto, repo: Boruta.Repo
 
   alias Boruta.Ecto
+
+  def hash_schema(schema, fields \\ [:value, :refresh_token]) do
+    plains = Map.take(schema, fields)
+
+    hashes =
+      schema
+      |> Map.take(fields)
+      |> Enum.into(%{}, fn {key, value} ->
+        {key, Boruta.Ecto.Token.hash_secret(value)}
+      end)
+
+    schema |> change(hashes) |> Boruta.Repo.update()
+    struct(schema, plains)
+  end
 
   def client_factory do
     %Ecto.Client{

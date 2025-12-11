@@ -350,15 +350,12 @@ defmodule Boruta.Ecto.Client do
   end
 
   defp put_secret(%Ecto.Changeset{data: data, changes: changes} = changeset) do
-    case fetch_change(changeset, :secret) do
-      {:ok, nil} ->
-        put_change(changeset, :secret, token_generator().secret(struct(data, changes)))
+    plain_secret =
+      get_change(changeset, :secret) || token_generator().secret(struct(data, changes))
 
-      {:ok, _secret} ->
-        changeset
+    hashed_secret = Boruta.Ecto.Token.hash_secret(plain_secret)
 
-      :error ->
-        put_change(changeset, :secret, token_generator().secret(struct(data, changes)))
-    end
+    changeset
+    |> put_change(:secret, hashed_secret)
   end
 end

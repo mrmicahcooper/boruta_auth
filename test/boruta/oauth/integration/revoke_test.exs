@@ -28,6 +28,7 @@ defmodule Boruta.OauthTest.RevokeTest do
           scope: "scope",
           sub: resource_owner.sub
         )
+        |> hash_schema()
 
       {:ok,
        client: client,

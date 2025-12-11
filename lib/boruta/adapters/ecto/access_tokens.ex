@@ -104,7 +104,7 @@ defmodule Boruta.Ecto.AccessTokens do
   @impl Boruta.Oauth.AccessTokens
   def revoke(%Oauth.Token{client: client, value: value}) do
     with %Token{} = token <-
-           repo().get_by(Token, client_id: client.id, value: Token.hash_secret(value)),
+           repo().get_by(Token, client_id: client.id, value: value),
          {:ok, token} <-
            token
            |> Token.revoke_changeset()
@@ -119,7 +119,7 @@ defmodule Boruta.Ecto.AccessTokens do
   @impl Boruta.Oauth.AccessTokens
   def revoke_refresh_token(%Oauth.Token{client: client, value: value}) do
     with %Token{} = token <-
-           repo().get_by(Token, client_id: client.id, value: Token.hash_secret(value)),
+           repo().get_by(Token, client_id: client.id, value: value),
          {:ok, token} <-
            token
            |> Token.revoke_refresh_token_changeset()

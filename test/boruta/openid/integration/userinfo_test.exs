@@ -53,7 +53,7 @@ defmodule Boruta.OpenidTest.UserinfoTest do
     end
 
     test "returns an error when token does not belong to a resource owner" do
-      %Token{value: access_token} = insert(:token)
+      %Token{value: access_token} = insert(:token) |> hash_schema()
 
       conn =
         %Plug.Conn{}
@@ -70,7 +70,7 @@ defmodule Boruta.OpenidTest.UserinfoTest do
     test "returns userinfo" do
       sub = SecureRandom.uuid()
       claims = %{"claim" => true}
-      %Token{value: access_token} = insert(:token, sub: sub)
+      %Token{value: access_token} = insert(:token, sub: sub) |> hash_schema()
 
       conn =
         %Plug.Conn{}
@@ -116,7 +116,7 @@ defmodule Boruta.OpenidTest.UserinfoTest do
     end
 
     test "returns an error when token does not belong to a resource owner" do
-      %Token{value: access_token} = insert(:token)
+      %Token{value: access_token} = insert(:token) |> hash_schema()
 
       conn = %Plug.Conn{body_params: %{"access_token" => access_token}}
 
@@ -131,7 +131,7 @@ defmodule Boruta.OpenidTest.UserinfoTest do
     test "returns userinfo" do
       sub = SecureRandom.uuid()
       claims = %{"claim" => true}
-      %Token{value: access_token} = insert(:token, sub: sub)
+      %Token{value: access_token} = insert(:token, sub: sub) |> hash_schema()
 
       conn = %Plug.Conn{body_params: %{"access_token" => access_token}}
 
@@ -153,7 +153,7 @@ defmodule Boruta.OpenidTest.UserinfoTest do
     test "returns userinfo as jwt when userinfo_signed_response_alg is defined" do
       sub = SecureRandom.uuid()
       claims = %{"claim" => true}
-      %Token{client: client, value: access_token} = insert(:token, sub: sub)
+      %Token{client: client, value: access_token} = insert(:token, sub: sub) |> hash_schema()
 
       {:ok, _client} =
         Ecto.Changeset.change(client, %{userinfo_signed_response_alg: "HS512"}) |> Repo.update()

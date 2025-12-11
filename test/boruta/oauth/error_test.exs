@@ -64,8 +64,14 @@ defmodule Boruta.Oauth.ErrorTest do
         state: "state"
       }
 
-      assert Error.redirect_to_url(error) ==
+      assert Error.redirect_to_url(error)
+             |> URI.parse()
+             |> Map.update!(:fragment, &URI.decode_query/1)
+             |> Kernel.==(
                "http://redirect.uri#error=error&error_description=Error+description&state=state"
+               |> URI.parse()
+               |> Map.update!(:fragment, &URI.decode_query/1)
+             )
     end
 
     test "returns an url with query with a state" do
@@ -78,8 +84,14 @@ defmodule Boruta.Oauth.ErrorTest do
         state: "state"
       }
 
-      assert Error.redirect_to_url(error) ==
+      assert Error.redirect_to_url(error)
+             |> URI.parse()
+             |> Map.update!(:query, &URI.decode_query/1)
+             |> Kernel.==(
                "http://redirect.uri?error=error&error_description=Error+description&state=state"
+               |> URI.parse()
+               |> Map.update!(:query, &URI.decode_query/1)
+             )
     end
   end
 end

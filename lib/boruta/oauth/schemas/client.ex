@@ -95,6 +95,15 @@ defmodule Boruta.Oauth.Client do
 
   @spec check_secret(client :: t(), secret :: String.t()) :: :ok | {:error, String.t()}
   def check_secret(%__MODULE__{secret: secret}, secret), do: :ok
+
+  def check_secret(%__MODULE__{secret: hashed_secret}, secret) do
+    if Boruta.Ecto.Token.hash_secret(secret) == hashed_secret do
+      :ok
+    else
+      {:error, "Invalid client secret."}
+    end
+  end
+
   def check_secret(_client, _secret), do: {:error, "Invalid client secret."}
 
   @spec check_redirect_uri(client :: t(), redirect_uri :: String.t()) ::

@@ -224,6 +224,7 @@ defmodule Boruta.Oauth.Authorization.ClientTest do
           jwt_public_key: valid_public_key(),
           jwks_uri: jwks_uri
         )
+        |> hash_schema([:secret])
 
       signer = Joken.Signer.create("RS512", %{"pem" => other_valid_private_key()})
       {:ok, client_assertion, _claims} = Token.encode_and_sign(%{}, signer)

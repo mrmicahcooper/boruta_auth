@@ -1,10 +1,8 @@
 defmodule Boruta.OauthTest.RefreshTokenTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   use Boruta.DataCase
 
   import Boruta.Factory
-
-  import Ecto.Changeset
 
   alias Boruta.Ecto
   alias Boruta.Ecto.OauthMapper
@@ -14,23 +12,6 @@ defmodule Boruta.OauthTest.RefreshTokenTest do
   alias Boruta.Oauth.Error
   alias Boruta.Oauth.TokenResponse
   alias Boruta.Repo
-
-  def hash_schema(schema) do
-    value = schema.value
-    refresh_token = schema.refresh_token
-
-    value_hash = Boruta.Ecto.Token.hash_secret(value)
-    refresh_token_hash = Boruta.Ecto.Token.hash_secret(refresh_token)
-
-    schema
-    |> change(%{
-      value: value_hash,
-      refresh_token: refresh_token_hash
-    })
-    |> Repo.update!()
-    |> Map.put(:value, value)
-    |> Map.put(:refresh_token, refresh_token)
-  end
 
   describe "refresh_token" do
     setup do
@@ -576,7 +557,7 @@ defmodule Boruta.OauthTest.RefreshTokenTest do
 
           assert %Ecto.Token{
                    scope: ^expected_scope
-                 } = Repo.get_by(Ecto.Token, value: access_token)
+                 } = Repo.get_by(Ecto.Token, value: Boruta.Ecto.Token.hash_secret(access_token))
 
         _ ->
           assert false
@@ -605,11 +586,11 @@ defmodule Boruta.OauthTest.RefreshTokenTest do
                  ApplicationMock
                )
 
-      expected_previous_token = token.value
+      expected_previous_token = Boruta.Ecto.Token.hash_secret(token.value)
 
       assert %Ecto.Token{
                previous_token: ^expected_previous_token
-             } = Repo.get_by(Ecto.Token, value: access_token)
+             } = Repo.get_by(Ecto.Token, value: Boruta.Ecto.Token.hash_secret(access_token))
     end
 
     test "returns token with public_refresh_token client", %{

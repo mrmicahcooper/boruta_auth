@@ -28,6 +28,7 @@ defmodule Boruta.OauthTest.IntrospectTest do
           scope: "scope",
           sub: resource_owner.id
         )
+        |> hash_schema()
 
       {:ok, client: client, token: token, resource_owner: resource_owner}
     end

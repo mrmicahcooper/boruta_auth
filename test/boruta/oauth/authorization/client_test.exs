@@ -231,6 +231,7 @@ defmodule Boruta.Oauth.Authorization.ClientTest do
 
       {_, jwk} = JOSE.JWK.from_pem(other_valid_public_key()) |> JOSE.JWK.to_map()
       jwk = Map.put(jwk, "alg", "RS512")
+
       Bypass.expect_once(bypass, "GET", "/jwks", fn conn ->
         Plug.Conn.resp(conn, 200, Jason.encode!(%{"keys" => [jwk]}))
       end)

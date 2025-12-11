@@ -9,14 +9,14 @@ config :boruta,
 
 config :boruta, Boruta.Cache,
   primary: [
-    gc_interval: 86_400_000, #=> 1 day
+    # => 1 day
+    gc_interval: 86_400_000,
     backend: :shards,
     partitions: 2
   ]
 
 config :phoenix, :json_library, Jason
 
-config :boruta, Boruta.Oauth,
-  repo: Boruta.Repo
+config :boruta, Boruta.Oauth, repo: Boruta.Repo
 
 import_config "#{config_env()}.exs"

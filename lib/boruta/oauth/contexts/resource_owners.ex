@@ -25,7 +25,8 @@ defmodule Boruta.Oauth.ResourceOwners do
   @doc """
   Returns `id_token` identity claims for the given resource owner. Those claims will be present in resulting `id_token` of OpenID Connect flows.
   """
-  @callback claims(resource_owner :: ResourceOwner.t(), scope :: String.t()) :: claims :: Boruta.Oauth.IdToken.claims()
+  @callback claims(resource_owner :: ResourceOwner.t(), scope :: String.t()) ::
+              claims :: Boruta.Oauth.IdToken.claims()
 
   @optional_callbacks claims: 2
 end

@@ -86,7 +86,10 @@ defmodule Boruta.Ecto.Client do
     field(:public_key, :string)
     field(:private_key, :string)
 
-    field(:token_endpoint_auth_methods, {:array, :string}, default: ["client_secret_basic", "client_secret_post"])
+    field(:token_endpoint_auth_methods, {:array, :string},
+      default: ["client_secret_basic", "client_secret_post"]
+    )
+
     field(:token_endpoint_jwt_auth_alg, :string, default: "HS256")
     field(:jwt_public_key, :string)
     field(:jwk, :map, virtual: true)

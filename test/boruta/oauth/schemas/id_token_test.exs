@@ -55,6 +55,7 @@ defmodule Boruta.Oauth.IdTokenTest do
     auth_time = DateTime.to_unix(last_login_at)
 
     client_id = client.id
+
     assert %{
              "aud" => ^client_id,
              "iat" => _iat,
@@ -103,6 +104,7 @@ defmodule Boruta.Oauth.IdTokenTest do
     auth_time = DateTime.to_unix(last_login_at)
 
     client_id = client.id
+
     assert %{
              "aud" => ^client_id,
              "iat" => _iat,
@@ -373,6 +375,7 @@ defmodule Boruta.Oauth.IdTokenTest do
       auth_time = DateTime.to_unix(last_login_at)
 
       client_id = client.id
+
       assert %{
                "aud" => ^client_id,
                "iat" => _iat,

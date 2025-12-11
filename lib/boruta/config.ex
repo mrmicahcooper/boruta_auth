@@ -138,16 +138,16 @@ defmodule Boruta.Config do
   @spec oauth_config() :: keyword()
   @doc false
   defp oauth_config do
-      Keyword.merge(
-        @defaults,
-        Application.get_env(:boruta, Boruta.Oauth) || [],
-        fn _, a, b ->
-          if Keyword.keyword?(a) && Keyword.keyword?(b) do
-            Keyword.merge(a, b)
-          else
-            b
-          end
+    Keyword.merge(
+      @defaults,
+      Application.get_env(:boruta, Boruta.Oauth) || [],
+      fn _, a, b ->
+        if Keyword.keyword?(a) && Keyword.keyword?(b) do
+          Keyword.merge(a, b)
+        else
+          b
         end
-      )
+      end
+    )
   end
 end

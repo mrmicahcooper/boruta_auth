@@ -10,20 +10,25 @@ defmodule Boruta.Openid.UserinfoResponseTest do
       client = %Client{id: SecureRandom.uuid()}
 
       assert %UserinfoResponse{
-        userinfo: ^userinfo,
-        format: :json
-      } = UserinfoResponse.from_userinfo(userinfo, client)
+               userinfo: ^userinfo,
+               format: :json
+             } = UserinfoResponse.from_userinfo(userinfo, client)
     end
 
     test "returns userinfo with client userinfo_signed_response_alg" do
       userinfo = %{"sub" => "sub"}
-      client = %Client{id: SecureRandom.uuid(), secret: "secret", userinfo_signed_response_alg: "HS256"}
+
+      client = %Client{
+        id: SecureRandom.uuid(),
+        secret: "secret",
+        userinfo_signed_response_alg: "HS256"
+      }
 
       assert %UserinfoResponse{
-        userinfo: ^userinfo,
-        jwt: jwt,
-        format: :jwt
-      } = UserinfoResponse.from_userinfo(userinfo, client)
+               userinfo: ^userinfo,
+               jwt: jwt,
+               format: :jwt
+             } = UserinfoResponse.from_userinfo(userinfo, client)
 
       # TODO test other client signing algorithms
       assert jwt

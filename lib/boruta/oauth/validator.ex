@@ -89,7 +89,9 @@ defmodule Boruta.Oauth.Validator do
   end
 
   def validate(:revoke, params) do
-    case ExJsonSchema.Validator.validate(Schema.revoke(), params, error_formatter: BorutaFormatter) do
+    case ExJsonSchema.Validator.validate(Schema.revoke(), params,
+           error_formatter: BorutaFormatter
+         ) do
       :ok ->
         {:ok, params}
 

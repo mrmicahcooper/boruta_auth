@@ -301,7 +301,11 @@ defmodule Boruta.Oauth.Authorization.Client do
   defp verify_secret_result(
          %Client{
            token_endpoint_auth_methods: ["private_key_jwt" | methods]
-         } = client, source, _error, _refreshed) do
+         } = client,
+         source,
+         _error,
+         _refreshed
+       ) do
     message = "Given client expects the credentials to be provided with a jwt assertion."
     do_extract_secret(source, %{client | token_endpoint_auth_methods: methods}, message)
   end

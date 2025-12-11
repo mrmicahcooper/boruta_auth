@@ -16,5 +16,8 @@ defmodule Boruta.Oauth.ClientCredentialsRequest do
           grant_type: String.t()
         }
   @enforce_keys [:client_id, :client_authentication]
-  defstruct client_id: nil, client_authentication: nil, scope: "", grant_type: "client_credentials"
+  defstruct client_id: nil,
+            client_authentication: nil,
+            scope: "",
+            grant_type: "client_credentials"
 end

@@ -78,7 +78,8 @@ defmodule Boruta.OauthTest.HybridGrantTest do
                {:authorize_error,
                 %Error{
                   error: :invalid_request,
-                  error_description: "Query params validation failed. #/response_mode do match required pattern /^(query|fragment)$/.",
+                  error_description:
+                    "Query params validation failed. #/response_mode do match required pattern /^(query|fragment)$/.",
                   status: :bad_request
                 }}
     end
@@ -172,7 +173,10 @@ defmodule Boruta.OauthTest.HybridGrantTest do
                 }}
     end
 
-    test "returns a code and a token without a nonce", %{client: client, resource_owner: resource_owner} do
+    test "returns a code and a token without a nonce", %{
+      client: client,
+      resource_owner: resource_owner
+    } do
       ResourceOwners
       |> expect(:authorized_scopes, fn _resource_owner -> [] end)
 
@@ -205,7 +209,10 @@ defmodule Boruta.OauthTest.HybridGrantTest do
       assert expires_in
     end
 
-    test "creates a code and an id_token with a nonce", %{client: client, resource_owner: resource_owner} do
+    test "creates a code and an id_token with a nonce", %{
+      client: client,
+      resource_owner: resource_owner
+    } do
       redirect_uri = List.first(client.redirect_uris)
       nonce = "nonce"
 
@@ -253,7 +260,10 @@ defmodule Boruta.OauthTest.HybridGrantTest do
                 }}
     end
 
-    test "returns an error as fragment without a nonce and `code id_token` response types", %{client: client, resource_owner: resource_owner} do
+    test "returns an error as fragment without a nonce and `code id_token` response types", %{
+      client: client,
+      resource_owner: resource_owner
+    } do
       ResourceOwners
       |> expect(:authorized_scopes, fn _resource_owner -> [] end)
 
@@ -270,7 +280,7 @@ defmodule Boruta.OauthTest.HybridGrantTest do
                },
                resource_owner,
                ApplicationMock
-      ) ==
+             ) ==
                {:authorize_error,
                 %Error{
                   format: :fragment,
@@ -281,7 +291,8 @@ defmodule Boruta.OauthTest.HybridGrantTest do
                 }}
     end
 
-    test "returns an error as query params with `response_mode=query`, without a nonce, and `code id_token` response types", %{client: client, resource_owner: resource_owner} do
+    test "returns an error as query params with `response_mode=query`, without a nonce, and `code id_token` response types",
+         %{client: client, resource_owner: resource_owner} do
       ResourceOwners
       |> expect(:authorized_scopes, fn _resource_owner -> [] end)
 
@@ -299,7 +310,7 @@ defmodule Boruta.OauthTest.HybridGrantTest do
                },
                resource_owner,
                ApplicationMock
-      ) ==
+             ) ==
                {:authorize_error,
                 %Error{
                   format: :query,
@@ -319,26 +330,27 @@ defmodule Boruta.OauthTest.HybridGrantTest do
       redirect_uri = List.first(client.redirect_uris)
 
       assert {:authorize_error,
-       %Boruta.Oauth.Error{
-         error: :unknown_error,
-         error_description: "An error occurred during token creation: \"Could not create code : sub is invalid\".",
-         format: :fragment,
-         redirect_uri: "https://redirect.uri",
-         state: nil,
-         status: :internal_server_error
-       }} =
-        Oauth.authorize(
-          %Plug.Conn{
-            query_params: %{
-              "response_type" => "code token",
-              "client_id" => client.id,
-              "redirect_uri" => redirect_uri,
-              "scope" => "openid"
-            }
-          },
-          resource_owner,
-          ApplicationMock
-        )
+              %Boruta.Oauth.Error{
+                error: :unknown_error,
+                error_description:
+                  "An error occurred during token creation: \"Could not create code : sub is invalid\".",
+                format: :fragment,
+                redirect_uri: "https://redirect.uri",
+                state: nil,
+                status: :internal_server_error
+              }} =
+               Oauth.authorize(
+                 %Plug.Conn{
+                   query_params: %{
+                     "response_type" => "code token",
+                     "client_id" => client.id,
+                     "redirect_uri" => redirect_uri,
+                     "scope" => "openid"
+                   }
+                 },
+                 resource_owner,
+                 ApplicationMock
+               )
     end
 
     test "does not return an id_token without `openid` scope", %{
@@ -375,7 +387,7 @@ defmodule Boruta.OauthTest.HybridGrantTest do
     test "returns a code and an id_token", %{client: client, resource_owner: resource_owner} do
       ResourceOwners
       |> expect(:authorized_scopes, fn _resource_owner -> [] end)
-      |> expect(:claims, fn (_sub, _scope) -> %{"email" => resource_owner.username} end)
+      |> expect(:claims, fn _sub, _scope -> %{"email" => resource_owner.username} end)
 
       redirect_uri = List.first(client.redirect_uris)
       nonce = "nonce"
@@ -398,7 +410,7 @@ defmodule Boruta.OauthTest.HybridGrantTest do
                      "nonce" => nonce
                    }
                  },
-                 %{resource_owner|extra_claims: %{"resource_owner_extra_claim" => "claim"}},
+                 %{resource_owner | extra_claims: %{"resource_owner_extra_claim" => "claim"}},
                  ApplicationMock
                )
 
@@ -424,10 +436,13 @@ defmodule Boruta.OauthTest.HybridGrantTest do
              } = claims
     end
 
-    test "returns a code and an id_token with `response_mode=query`", %{client: client, resource_owner: resource_owner} do
+    test "returns a code and an id_token with `response_mode=query`", %{
+      client: client,
+      resource_owner: resource_owner
+    } do
       ResourceOwners
       |> expect(:authorized_scopes, fn _resource_owner -> [] end)
-      |> expect(:claims, fn (_sub, _scope) -> %{"email" => resource_owner.username} end)
+      |> expect(:claims, fn _sub, _scope -> %{"email" => resource_owner.username} end)
 
       redirect_uri = List.first(client.redirect_uris)
       nonce = "nonce"
@@ -512,7 +527,10 @@ defmodule Boruta.OauthTest.HybridGrantTest do
       assert expires_in
     end
 
-    test "returns a code and a token with `response_mode=query`", %{client: client, resource_owner: resource_owner} do
+    test "returns a code and a token with `response_mode=query`", %{
+      client: client,
+      resource_owner: resource_owner
+    } do
       ResourceOwners
       |> expect(:authorized_scopes, fn _resource_owner -> [] end)
 
@@ -555,7 +573,7 @@ defmodule Boruta.OauthTest.HybridGrantTest do
     } do
       ResourceOwners
       |> expect(:authorized_scopes, fn _resource_owner -> [] end)
-      |> expect(:claims, fn (_sub, _scope) -> %{"email" => resource_owner.username} end)
+      |> expect(:claims, fn _sub, _scope -> %{"email" => resource_owner.username} end)
 
       redirect_uri = List.first(client.redirect_uris)
       nonce = "nonce"
@@ -578,7 +596,7 @@ defmodule Boruta.OauthTest.HybridGrantTest do
                      "nonce" => nonce
                    }
                  },
-                 %{resource_owner|extra_claims: %{"resource_owner_extra_claim" => "claim"}},
+                 %{resource_owner | extra_claims: %{"resource_owner_extra_claim" => "claim"}},
                  ApplicationMock
                )
 
@@ -611,7 +629,7 @@ defmodule Boruta.OauthTest.HybridGrantTest do
     } do
       ResourceOwners
       |> expect(:authorized_scopes, fn _resource_owner -> [] end)
-      |> expect(:claims, fn (_sub, _scope) -> %{"email" => resource_owner.username} end)
+      |> expect(:claims, fn _sub, _scope -> %{"email" => resource_owner.username} end)
 
       redirect_uri = List.first(client.redirect_uris)
       nonce = "nonce"
@@ -668,7 +686,7 @@ defmodule Boruta.OauthTest.HybridGrantTest do
     } do
       ResourceOwners
       |> expect(:authorized_scopes, fn _resource_owner -> [] end)
-      |> expect(:claims, fn (_sub, _scope) -> %{"email" => resource_owner.username} end)
+      |> expect(:claims, fn _sub, _scope -> %{"email" => resource_owner.username} end)
 
       redirect_uri = "https://wildcard-redirect-uri.uri"
       nonce = "nonce"
@@ -748,7 +766,10 @@ defmodule Boruta.OauthTest.HybridGrantTest do
       assert expires_in
     end
 
-    test "returns a code with public scope (from cache)", %{client: client, resource_owner: resource_owner} do
+    test "returns a code with public scope (from cache)", %{
+      client: client,
+      resource_owner: resource_owner
+    } do
       ResourceOwners
       |> expect(:authorized_scopes, fn _resource_owner -> [] end)
 
